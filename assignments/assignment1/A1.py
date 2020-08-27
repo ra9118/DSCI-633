@@ -1,5 +1,8 @@
-from sklearn.naive_bayes import GaussianNB
+from sklearn.datasets import load_iris
 import pandas as pd
+from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeClassifier
+
 
 if __name__ == "__main__":
     #  Load training data
@@ -8,8 +11,9 @@ if __name__ == "__main__":
     independent = ["SepalLengthCm",	"SepalWidthCm",	"PetalLengthCm",	"PetalWidthCm"]
     X = data_train[independent]
     Y = data_train["Species"]
+
     # Train model
-    clf = GaussianNB()
+    clf = DecisionTreeClassifier(random_state=0)
     clf.fit(X,Y)
     # Load testing data
     data_test = pd.read_csv("../data/Iris_test.csv")
@@ -21,3 +25,7 @@ if __name__ == "__main__":
     # Print results
     for i,pred in enumerate(predictions):
         print("%s\t%f" %(pred,max(probs[i])))
+
+
+
+
