@@ -22,14 +22,9 @@ class my_NB:
         # make sure to use self.alpha in the __init__() function as the smoothing factor when calculating P(xi|yj)
         self.P = {}
         for row in range(X.shape[0]):
+            yj = y[row]
             for Xi in range(69):
-                yj =y[row]
                 xi = X.loc[row,Xi]
-                # hasFound = False
-                # for yjT,XiT,xiT in self.P.keys():
-                #     if yjT==yj  and XiT== Xi and xiT== xi:
-                #         hasFound = True
-
                 if (yj,Xi,xi) in self.P.keys():
                     self.P[yj,Xi,xi] = self.P[yj,Xi,xi] + 1
                 else:
@@ -37,7 +32,8 @@ class my_NB:
 
         # find prop
         for yj, Xi, xi in self.P.keys():
-            self.P[yj, Xi, xi] = self.P[yj, Xi, xi] / X.shape[0] 
+            a = len(set(list(X.loc[:, Xi])))
+            self.P[yj, Xi, xi] = (self.P[yj, Xi, xi]+self.alpha) / (self.P_y[yj] + a*self.alpha)
 
         return
 
@@ -50,11 +46,12 @@ class my_NB:
         for label in self.classes_:
             p = self.P_y[label]
             for key in X:
-                p *= X[key].apply(lambda value: self.P[label,key,value] if (label,key,value) in self.P.keys() else self.alpha)
+                p *= X[key].apply(lambda value: self.P[label,key,value] if (label,key,value) in self.P.keys() else 1)
             probs[label] = p
         probs = pd.DataFrame(probs, columns=self.classes_)
         sums = probs.sum(axis=1)
         probs = probs.apply(lambda v: v / sums)
+        #print(probs)
         return probs
 
     def predict(self, X):
@@ -62,6 +59,7 @@ class my_NB:
         # return predictions: list
         # write your code below
         probs = self.predict_proba(X)
+        probs.to_csv("test.csv",index=False)
         predictions = [self.classes_[np.argmax(prob)] for prob in probs.to_numpy()]
         return predictions
 
