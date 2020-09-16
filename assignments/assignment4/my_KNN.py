@@ -33,8 +33,7 @@ class my_KNN:
         # Calculate distances of training data to a single input data point (distances from self.X to x)
         # Output np.array([distances to x])
         distances = list()
-        rowIndex=0
-        for train_row in self.X.to_numpy():
+        for train_row, classLabel in zip(self.X.to_numpy(), self.y):
             distance = 0.0
             if self.metric == "minkowski":
                 distance = self.my_p_root(sum(pow(abs(a-b), self.p) for a, b in zip(train_row, x)), self.p)
@@ -53,8 +52,8 @@ class my_KNN:
 
             else:
                 raise Exception("Unknown criterion.")
-            distances.append((self.y[rowIndex], distance))
-            rowIndex = rowIndex + 1
+            distances.append((classLabel, distance))
+
         return distances
 
     def k_neighbors(self,x):
