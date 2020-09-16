@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from collections import Counter
+
+
 class my_DT:
 
     def __init__(self, criterion="gini", max_depth=8, min_impurity_decrease=0, min_samples_split=2):
@@ -14,30 +16,22 @@ class my_DT:
         self.min_impurity_decrease = min_impurity_decrease
         self.min_samples_split = int(min_samples_split)
 
+
     def impurity(self, labels):
         # Calculate impurity (unweighted)
         # Input is a list (or np.array) of labels
-        # Output impurity score <= 1
+        # Output impurity score
         stats = Counter(labels)
         N = float(len(labels))
-        s = 0
         if self.criterion == "gini":
             # Implement gini impurity
-            for key in stats:
-                s = s + (stats[key]/N])**2
-            impure = 1 - s
-
-
-
 
 
 
 
         elif self.criterion == "entropy":
             # Implement entropy impurity
-              for key in stats:
-                  s= s ( stats[key]/N) *math.log(stats[key/]/N,2)
-              ipure= -s
+
 
 
 
@@ -45,7 +39,7 @@ class my_DT:
             raise Exception("Unknown criterion.")
         return impure
 
-    def find_best_split(self, pop, X, labels, split_impurity=None, r_node_indices=None):
+    def find_best_split(self, pop, X, labels):
         # Find the best split
         # Inputs:
         #   pop:    indices of data in the node
@@ -54,38 +48,6 @@ class my_DT:
         # Output: tuple(best feature to split, weighted impurity score of best split, splitting point of the feature, [indices of data in left node, indices of data in right node], [weighted impurity score of left node, weighted impurity score of right node])
         ######################
         best_feature = None
-        split_impurity=len(pop)
-        gl_node_indices=[]
-        gr_node_indices = []
-        gl_node_impurity = []
-        gr_node_impurity = []
-        check_splitvalue = []
-        check_splitvalue_impurity=[]
-        for feature in x.keys():
-            cans =np.array(x[feature][pop])
-            for i in range(len(cans)):
-                l_node=[]
-                r_node =[]
-                l_node_indices=[]
-                for j in range(len(cans)):
-                    if cans[j]<cans[i]:
-                        l_node.append(label is [pop[j]])
-                        l_node.indices.append(pop[j])
-                    else:
-                        r_node.append(labels[pop[j]])
-                        r_node_indices.append(pop[j])
-                gl_node_impurity=self.impurity(l_node)
-                gr_node_impurity=self.impurity(r_node)
-                new_impurity=((gl_node_impurity))
-
-
-
-
-
-
-
-
-
         for feature in X.keys():
             cans = np.array(X[feature][pop])
 
@@ -124,7 +86,7 @@ class my_DT:
                 else:
                     # Find the best split using find_best_split function
                     best_feature = self.find_best_split(current_pop, X, labels)
-                    if (current_impure - best_feature[1]) > self.min_impurity_decrease * N:
+                    if best_feature and (current_impure - best_feature[1]) > self.min_impurity_decrease * N:
                         # Split the node
                         self.tree[node] = (best_feature[0], best_feature[2])
                         next_nodes.extend([node * 2 + 1, node * 2 + 2])
