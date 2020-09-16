@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from collections import Counter
-
+from math import *
 
 class my_DT:
 
@@ -23,14 +23,17 @@ class my_DT:
         # Output impurity score
         stats = Counter(labels)
         N = float(len(labels))
+        impure=0
         if self.criterion == "gini":
             # Implement gini impurity
+            impure =  1 - sum( pow(stats[label]/N,2)  for label in stats.keys())
 
 
 
 
         elif self.criterion == "entropy":
             # Implement entropy impurity
+            impure =  sum(  -(stats[label]/N)*np.log2(stats[label]/N)  for label in  stats.keys())
 
 
 
