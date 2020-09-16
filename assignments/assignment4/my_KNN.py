@@ -48,7 +48,7 @@ class my_KNN:
 
 
             elif self.metric == "cosine":
-                distance = sum(a*b for a, b in zip(train_row, x))
+                distance =  np.dot(train_row, x) / (np.sqrt(np.dot(train_row, x)) * np.sqrt(np.dot(train_row, x)))
 
 
             else:
