@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 from collections import Counter
-from math import *
-from decimal import Decimal
 
 class my_KNN:
 
@@ -15,7 +13,6 @@ class my_KNN:
         self.metric = metric
         self.p = p
 
-
     def fit(self, X, y):
         # X: pd.DataFrame, independent variables, float
         # y: list, np.array or pd.Series, dependent variables, int or str
@@ -24,50 +21,38 @@ class my_KNN:
         self.y = y
         return
 
-    def my_p_root(self, value, root):
-        my_root_value = 1 / float(root)
-        return round(Decimal(value) **
-                     Decimal(my_root_value), 3)
-
     def dist(self,x):
         # Calculate distances of training data to a single input data point (distances from self.X to x)
         # Output np.array([distances to x])
-        distances = list()
-        rowIndex=0
-        for train_row in self.X.to_numpy():
-            distance = 0.0
-            if self.metric == "minkowski":
-                distance = self.my_p_root(sum(pow(abs(a-b), self.p) for a, b in zip(train_row, x)), self.p)
-
-            elif self.metric == "euclidean":
-                distance = sqrt(sum(pow(a-b, 2) for a, b in zip(train_row, x)))
+        if self.metric == "minkowski":
+            distances = "write your own code"
 
 
-            elif self.metric == "manhattan":
-                distance = sum(abs(a-b) for a, b in zip(train_row, x))
+        elif self.metric == "euclidean":
+            distances = "write your own code"
 
 
-            elif self.metric == "cosine":
-                distance = sum(a*b for a, b in zip(train_row, x))
+        elif self.metric == "manhattan":
+            distances = "write your own code"
 
 
-            else:
-                raise Exception("Unknown criterion.")
-            distances.append((self.y[rowIndex], distance))
-            rowIndex = rowIndex + 1
+        elif self.metric == "cosine":
+            distances = "write your own code"
+
+
+        else:
+            raise Exception("Unknown criterion.")
         return distances
 
     def k_neighbors(self,x):
         # Return the stats of the labels of k nearest neighbors to a single input data point (np.array)
         # Output: Counter(labels of the self.n_neighbors nearest neighbors)
         distances = self.dist(x)
-        distances.sort(key=lambda tup: tup[1], reverse=True)
-        neighbors = list()
-        for i in range(self.n_neighbors):
-            neighbors.append(distances[i][0])
+        output = "write your own code"
 
 
-        return Counter(neighbors)
+
+        return output
 
     def predict(self, X):
         # X: pd.DataFrame, independent variables, float
@@ -91,3 +76,6 @@ class my_KNN:
             probs.append({key: neighbors[key] / float(self.n_neighbors) for key in self.classes_})
         probs = pd.DataFrame(probs, columns=self.classes_)
         return probs
+
+
+
