@@ -49,7 +49,11 @@ class my_AdaBoost:
                 error = np.sum(diffs * w)
 
             # Compute alpha for estimator i (don't forget to use k for multi-class)
-            alpha = self.learning_rate_ * math.log((1.0 - error) / error) + np.exp(k-1) # 1 is learning rate
+            if(error <= 0.5):
+             alpha = self.learning_rate_ * math.log((1.0 - error) / error) + np.log(k-1) # 1 is learning rate
+            else:
+             alpha = self.learning_rate_ * math.log((1.0 - error) / error)
+
             self.alpha.append(alpha)
 
             # Update wi
