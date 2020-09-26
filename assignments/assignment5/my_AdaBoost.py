@@ -2,16 +2,18 @@ import pandas as pd
 import numpy as np
 from copy import deepcopy
 from pdb import set_trace
+import math
 
 class my_AdaBoost:
 
-    def __init__(self, base_estimator = None, n_estimators = 50):        
+    def __init__(self, base_estimator = None, n_estimators = 50,learning_rate=1):
         # Multi-class Adaboost algorithm (SAMME)
         # base_estimator: the base classifier class, e.g. my_DT
         # n_estimators: # of base_estimator rounds
         self.base_estimator = base_estimator
         self.n_estimators = int(n_estimators)
         self.estimators = [deepcopy(self.base_estimator) for i in range(self.n_estimators)]
+        self.learning_rate_ = learning_rate
 
     def fit(self, X, y):
         # X: pd.DataFrame, independent variables, float
@@ -19,10 +21,10 @@ class my_AdaBoost:
 
         self.classes_ = list(set(list(y)))
         k = len(self.classes_)
-        n = len(y)
-        w = np.array([1.0 / n] * n)
+        n = len(y)  # number of samples
+        w = np.array([1.0 / n] * n) # init weights for samples
         labels = np.array(y)
-        self.alpha = []
+        self.alpha = []  # the weight of this tree
         for i in range(self.n_estimators):
             # Sample with replacement from X, with probability w
             sample = np.random.choice(n, n, p=w)
@@ -45,11 +47,24 @@ class my_AdaBoost:
                 diffs = np.array(predictions) != y
                 # Compute error rate and alpha for estimator i
                 error = np.sum(diffs * w)
+
             # Compute alpha for estimator i (don't forget to use k for multi-class)
-            self.alpha.append("write your own code")
+            alpha = self.learning_rate_ * math.log((1.0 - error) / error) + np.exp(k-1) # 1 is learning rate
+            self.alpha.append(alpha)
 
             # Update wi
-            w = "write your own code"
+            # Missclassified samples gets larger weights and correctly classified samples smaller
+            w1 = []
+            for w, isError in zip(w, diffs):
+                if isError:
+                    w1.append(w * np.exp(alpha))  # change weight it got wrong predication
+                else:
+                    w1.append(w)  # keep weight got correct predication
+            w = np.array(w1)
+
+           # w *= np.exp((1-alpha)/alpha)+  np.exp(k-1)
+            # Normalize to one
+            w /= np.sum(w)
 
         # Normalize alpha
         self.alpha = self.alpha / np.sum(self.alpha)
@@ -68,15 +83,47 @@ class my_AdaBoost:
         # prob(x)[C] = sum(alpha[j] * (base_model[j].predict(x) == C))
         # return probs = pd.DataFrame(list of prob, columns = self.classes_)
         # write your code below
-        probs = {}
-        for label in self.classes_:
-            # Calculate probs for each label
-            "write your own code"
 
+
+        probs = []
+
+        # find predictions for every tree and every row of data
+        listOfPredictions = []
+        for j in range(self.n_estimators):
+                    predictions = self.estimators[j].predict(X)
+                    listOfPredictions.append(predictions)
+
+        dflistOfPredictions = pd.DataFrame(listOfPredictions)
+
+        # find decsion by voting
+        for col in range(dflistOfPredictions.shape[1]):
+
+             # z init class
+             pClass = dict()
+             for className in self.classes_:
+                pClass[className] = 0
+
+             for row in range(dflistOfPredictions.shape[0]):
+                classNameInRow = dflistOfPredictions.iloc[row, col]
+                pClass[classNameInRow] = pClass[classNameInRow]+ self.alpha[row]
+
+             probs.append({className:pClass[className] for className in self.classes_})
 
 
         probs = pd.DataFrame(probs, columns=self.classes_)
         return probs
+
+        # probs = {}
+        # for label in self.classes_:
+        #     add_val = []
+        #     for j in range(self.n_estimators):
+        #             predictions = self.estimators[j].predict(X)
+        #             add_val.append(self.alpha[j]*(predictions==label))
+        #             #set_trace()
+        #     probs[label] = np.sum(add_val,axis=0)
+        # probs = pd.DataFrame(probs, columns=self.classes_)
+        # return probs
+
 
 
 
