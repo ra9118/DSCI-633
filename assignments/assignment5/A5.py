@@ -1,9 +1,6 @@
 from my_AdaBoost import my_AdaBoost
-####### Add assignment2 to sys.path to import my_DT #######
-import sys
-sys.path.insert(0,'../assignment2')
-from my_DT import my_DT
-##################################################
+from sklearn.tree import DecisionTreeClassifier
+
 import pandas as pd
 
 if __name__ == "__main__":
@@ -14,8 +11,8 @@ if __name__ == "__main__":
     X = data_train[independent]
     y = data_train["Species"]
     # Train model
-    base_estimator = my_DT(criterion = "entropy", max_depth = 1)
-    clf = my_AdaBoost(base_estimator=base_estimator, n_estimators = 10)
+    base_estimator = DecisionTreeClassifier(criterion = "entropy", max_depth = 1)
+    clf = my_AdaBoost(base_estimator=base_estimator, n_estimators = 50)
     clf.fit(X, y)
     # Load testing data
     data_test = pd.read_csv("../data/Iris_test.csv")
