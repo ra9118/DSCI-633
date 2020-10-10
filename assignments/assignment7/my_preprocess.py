@@ -1,41 +1,105 @@
-import my_preprocess
-import pandas as pd
+import numpy as np
+from scipy.linalg import svd
+from copy import deepcopy
 from collections import Counter
-from sklearn.tree import DecisionTreeClassifier
+from pdb import set_trace
 
-##################################################
+def pca(X, n_components = 5):
+    #  Use svd to perform PCA on X
+    #  Inputs:
+    #     X: input matrix
+    #     n_components: number of principal components to keep
+    #  Output:
+    #     principal_components: the top n_components principal_components
+    #     X_pca = X.dot(principal_components)
 
-if __name__ == "__main__":
-    # Load training data
-    data_train = pd.read_csv("../data/Iris_train.csv")
-    # Separate independent variables and dependent variables
-    independent = ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"]
-    X = data_train[independent]
-    y = data_train["Species"]
-    # Preprocess (train)
-    X_norm = my_preprocess.normalize(X)
-    principal_components = my_preprocess.pca(X_norm, n_components=2)
-    X_pca = X_norm.dot(principal_components)
-    sample = my_preprocess.stratified_sampling(y, ratio=0.5, replace=False)
-
-    X_sample = X_pca[sample]
-    y_sample = y[sample].to_numpy()
-    print(X_pca)
-    print(Counter(y_sample))
-    print(Counter(y))
-    # Fit model
-    clf = DecisionTreeClassifier()
-    clf.fit(X_sample, y_sample)
-    # Load testing data
-    data_test = pd.read_csv("../data/Iris_test.csv")
-    X_test = data_test[independent]
-    # Preprocess (test)
-    X_test_norm = my_preprocess.normalize(X_test)
-    X_test_pca = X_test_norm.dot(principal_components)
-    # Predict
-    predictions = clf.predict(X_test_pca)
-    # Output predictions on test data
-    print(predictions)
+    U, s, Vh = svd(X)
+    #features = X.T
+    # cov_matrix = np.cov(features)
+    # values, vectors = np.linalg.eig(cov_matrix)
+    #vectors.T[0:n_components]
 
 
 
+    principal_components = Vh[0:n_components].T   #vectors.T[0:n_components]
+    return principal_components
+
+def vector_norm(x, norm="Min-Max"):
+    # Calculate the normalized vector
+    # Input x: 1-d np.array
+    if norm == "Min-Max":
+        min= np.min(x)
+        max = np.max(x)
+        x_norm = [ (number- min)/(max-min) for number in x]
+    elif norm == "L1":
+        sum = np.sum(np.abs(x))
+        x_norm = [number / sum for number in x]
+    elif norm == "L2":
+        sum = np.sqrt(np.sum([number**2 for number in x]))
+        x_norm = [number / sum for number in x]
+    elif norm == "Standard_Score":
+        mean = np.mean(x)
+        std = np.std(x)
+        x_norm = [(number - mean) / std for number in x]
+    else:
+        raise Exception("Unknown normlization.")
+    return np.array(x_norm)
+
+def normalize(X, norm="Min-Max", axis = 1):
+    #  Inputs:
+    #     X: input matrix
+    #     norm = {"L1", "L2", "Min-Max", "Standard_Score"}
+    #     axis = 0: normalize rows
+    #     axis = 1: normalize columns
+    #  Output:
+    #     X_norm: normalized matrix (numpy.array)
+
+    X_norm = deepcopy(np.asarray(X))
+    m, n = X_norm.shape
+    if axis == 1:
+        for col in range(n):
+            X_norm[:,col] = vector_norm(X_norm[:,col], norm=norm)
+    elif axis == 0:
+        X_norm = np.array([vector_norm(X_norm[i], norm=norm) for i in range(m)])
+    else:
+        raise Exception("Unknown axis.")
+    return X_norm
+
+def stratified_sampling(y, ratio, replace = True):
+    #  Inputs:
+    #     y: a 1-d array of class labels
+    #     0 < ratio < 1: number of samples = len(y) * ratio
+    #     replace = True: sample with replacement
+    #     replace = False: sample without replacement
+    #  Output:
+    #     sample: indices of stratified sampled points
+    #             (ratio is the same across each class,
+    #             samples for each class = int(np.ceil(ratio * # data in each class)) )
+
+
+    if ratio<=0 or ratio>=1:
+        raise Exception("ratio must be 0 < ratio < 1.")
+    y_array = np.asarray(y)
+
+    # Find the indexs that belong to every class
+    classes_ = list(set(list(y)))
+    classDic =dict()
+    for clasName in classes_:
+        classDic[clasName] = []
+
+    for index in range(len(y)):
+        temp = classDic[y[index]]
+        temp.append(index)
+        classDic[y[index]]=temp
+
+    #sampling
+    sample =[]
+    for clasName in classes_:
+        temp = classDic[clasName]
+        countOfClassSamples= int(np.ceil(ratio * len(temp)) )
+        random_idx = np.random.permutation(temp)
+        #selectRowsFromClass = random_idx[:countOfClassSamples]
+        for i in range(countOfClassSamples):
+            sample.append(random_idx[i])
+    sample = np.asarray(sample)
+    return sample.astype(int)
