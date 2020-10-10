@@ -14,36 +14,25 @@ def pca(X, n_components = 5):
     #     X_pca = X.dot(principal_components)
 
     U, s, Vh = svd(X)
-    #features = X.T
-    # cov_matrix = np.cov(features)
-    # values, vectors = np.linalg.eig(cov_matrix)
-    #vectors.T[0:n_components]
 
-
-
-    principal_components = Vh[0:n_components].T   #vectors.T[0:n_components]
+    # Write your own code
+    principal_components = "Write your own code"
     return principal_components
 
 def vector_norm(x, norm="Min-Max"):
     # Calculate the normalized vector
     # Input x: 1-d np.array
     if norm == "Min-Max":
-        min= np.min(x)
-        max = np.max(x)
-        x_norm = [ (number- min)/(max-min) for number in x]
+        x_norm = "Write your own code"
     elif norm == "L1":
-        sum = np.sum(np.abs(x))
-        x_norm = [number / sum for number in x]
+        x_norm = "Write your own code"
     elif norm == "L2":
-        sum = np.sqrt(np.sum([number**2 for number in x]))
-        x_norm = [number / sum for number in x]
+        x_norm = "Write your own code"
     elif norm == "Standard_Score":
-        mean = np.mean(x)
-        std = np.std(x)
-        x_norm = [(number - mean) / std for number in x]
+        x_norm = "Write your own code"
     else:
         raise Exception("Unknown normlization.")
-    return np.array(x_norm)
+    return x_norm
 
 def normalize(X, norm="Min-Max", axis = 1):
     #  Inputs:
@@ -76,30 +65,10 @@ def stratified_sampling(y, ratio, replace = True):
     #             (ratio is the same across each class,
     #             samples for each class = int(np.ceil(ratio * # data in each class)) )
 
-
     if ratio<=0 or ratio>=1:
         raise Exception("ratio must be 0 < ratio < 1.")
     y_array = np.asarray(y)
+    # Write your own code below
 
-    # Find the indexs that belong to every class
-    classes_ = list(set(list(y)))
-    classDic =dict()
-    for clasName in classes_:
-        classDic[clasName] = []
 
-    for index in range(len(y)):
-        temp = classDic[y[index]]
-        temp.append(index)
-        classDic[y[index]]=temp
-
-    #sampling
-    sample =[]
-    for clasName in classes_:
-        temp = classDic[clasName]
-        countOfClassSamples= int(np.ceil(ratio * len(temp)) )
-        random_idx = np.random.permutation(temp)
-        #selectRowsFromClass = random_idx[:countOfClassSamples]
-        for i in range(countOfClassSamples):
-            sample.append(random_idx[i])
-    sample = np.asarray(sample)
     return sample.astype(int)
