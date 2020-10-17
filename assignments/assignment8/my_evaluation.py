@@ -143,20 +143,20 @@ class my_evaluation:
                 tpr = 0
                 fpr = 0
                 auc_target = 0
-                for i in order:
-                    if self.actuals[i] == target:
-                        tp = np.sum([ 1 if (self.predictions[index]==target) else 0  for index in range(i,len(self.predictions))])
-                        fn = np.sum([ 1 if (self.predictions[index]!=target) else 0  for index in range(i,len(self.predictions))])
+                for i in range(len(order)):
+                    if self.actuals[order[i]] == target:
+                        tp = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(0,i)])
+                        fn = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(i,len(self.predictions))])
                         tpr = float(tp) / (tp + fn)
                     else:
-                        fp = np.sum([ 1 if (self.predictions[index]==target) else 0  for index in range(i,len(self.predictions))])
-                        tn = np.sum([ 1 if (self.predictions[index]!=target) else 0  for index in range(i,len(self.predictions))])
+                        fp = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(0,i)])
+                        tn = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(i,len(self.predictions))])
                         pre_fpr = fpr
                         fpr = float(fp) / (fp + tn)
                         auc_target += tpr*(fpr-pre_fpr)
             else:
                 raise Exception("Unknown target class.")
 
-            return auc_target
+            return 1- auc_target
 
 
