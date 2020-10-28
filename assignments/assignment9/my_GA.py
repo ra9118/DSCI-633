@@ -70,7 +70,7 @@ class my_GA:
             indices = [i for i in range(len(self.data_y))]
             np.random.shuffle(indices)
             size = int(np.ceil(len(self.data_y) / float(self.crossval_fold)))
-            objs_crossval = []
+            objs_crossval = None
             for fold in range(self.crossval_fold):
                 start = int(fold * size)
                 end = start + size
@@ -91,14 +91,14 @@ class my_GA:
                 objs = np.array(self.obj_func(predictions, actuals, pred_proba))
                 #prec = objs[0]
                 #rec = objs[0]
-                # if type(objs_crossval) == type(None):
-                #     objs_crossval = objs[0] #2.0 * prec * rec / (prec + rec)
-                # else:
-                #     objs_crossval += objs[0] #(2.0 * prec * rec / (prec + rec))
-                objs_crossval.append(objs[0])
+                if type(objs_crossval) == type(None):
+                    objs_crossval = objs
+                else:
+                    objs_crossval += objs
+               # objs_crossval.append(objs[0])
 
-            #objs_crossval = objs_crossval / float(len(self.data_y))
-            self.evaluated[decision] = tuple(objs_crossval)
+            objs_crossval = objs_crossval / float(len(self.data_y))
+            self.evaluated[decision] = objs_crossval
         return self.evaluated[decision]
 
     def is_better(self, a, b):
@@ -112,11 +112,15 @@ class my_GA:
         obj_b = self.evaluate(b)
         # write your own code below
         atLeastOne = False
+        allGood = True
         for i in range(len(obj_a)):
             if(obj_a[i] > obj_b[i]):
                 atLeastOne = True
+            if (obj_a[i] < obj_b[i]):
+                allGood = False
                 break
-        if obj_a >= obj_b and atLeastOne == True:
+
+        if allGood == True and atLeastOne == True:
             return 1
         else:
             return -1
