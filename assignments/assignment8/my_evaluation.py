@@ -1,5 +1,6 @@
 import numpy as np
 from collections import Counter
+from pdb import set_trace
 
 class my_evaluation:
     # Binary class or multi-class classification evaluation
@@ -27,13 +28,11 @@ class my_evaluation:
         correct = self.predictions == self.actuals
         self.acc = float(Counter(correct)[True])/len(correct)
         self.confusion_matrix = {}
-        # for actual, prediction,cc in zip(self.actuals, self.predictions,correct):
-        #     print("{},{}==>{}".format(actual,prediction,cc))
         for label in self.classes_:
-            tp =   np.sum([ 1 if (actual==label and prediction==label) else 0  for actual,prediction in zip(self.actuals,self.predictions)])
-            fp =   np.sum([ 1 if (actual!=label and prediction==label) else 0  for actual,prediction in zip(self.actuals,self.predictions)])
-            tn =   np.sum([ 1 if (actual!=label and prediction!=label) else 0  for actual,prediction in zip(self.actuals,self.predictions)])
-            fn =  np.sum([ 1 if (actual==label and prediction!=label) else 0  for actual,prediction in zip(self.actuals,self.predictions)])
+            tp = Counter(correct & (self.predictions == label))[True]
+            fp = Counter((self.actuals != label) & (self.predictions == label))[True]
+            tn = Counter(correct & (self.predictions != label))[True]
+            fn = Counter((self.actuals == label) & (self.predictions != label))[True]
             self.confusion_matrix[label] = {"TP":tp, "TN": tn, "FP": fp, "FN": fn}
         return
 
@@ -86,6 +85,7 @@ class my_evaluation:
         # average: {"macro", "micro", "weighted"}. If target==None, return average recall
         # output: recall = float
         # note: be careful for divided by 0
+
         if self.confusion_matrix==None:
             self.confusion()
         if target in self.classes_:
@@ -114,7 +114,7 @@ class my_evaluation:
                         ratio = Counter(self.actuals)[label] / float(n)
                     else:
                         raise Exception("Unknown type of average.")
-                    rec +=rec_label * ratio
+                    rec += rec_label * ratio
         return rec
 
     def f1(self, target=None, average = "macro"):
@@ -123,9 +123,9 @@ class my_evaluation:
         # average: {"macro", "micro", "weighted"}. If target==None, return average f1
         # output: f1 = float
 
-        prec =  self.precision( target, "macro")
-        rec =  self.recall(target, "macro")
-        f1_score =  2*(prec*rec)/(prec+rec)
+        prec = self.precision(target = target, average=average)
+        rec = self.recall(target = target, average=average)
+        f1_score = 2.0 * prec * rec / (prec + rec)
         return f1_score
 
     def auc(self, target):
@@ -143,20 +143,20 @@ class my_evaluation:
                 tpr = 0
                 fpr = 0
                 auc_target = 0
-                for i in range(len(order)):
-                    if self.actuals[order[i]] == target:
-                        tp = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(0,i)])
-                        fn = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(i,len(self.predictions))])
+                for i in order:
+                    if self.actuals[i] == target:
+                        tp+=1
+                        fn-=1
                         tpr = float(tp) / (tp + fn)
                     else:
-                        fp = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(0,i)])
-                        tn = np.sum([ 1 if (self.predictions[order[index]]==target) else 0  for index in range(i,len(self.predictions))])
+                        fp+=1
+                        tn-=1
                         pre_fpr = fpr
-                        fpr = float(fp) / (fp + tn)
-                        auc_target += tpr*(fpr-pre_fpr)
+                        fpr = float(fp) / (tn + fp)
+                        auc_target += tpr * (fpr - pre_fpr)
             else:
                 raise Exception("Unknown target class.")
 
-            return 1- auc_target
+            return auc_target
 
 
