@@ -87,7 +87,6 @@ class my_GA:
                 clf.fit(X_train, y_train)
                 predictions = clf.predict(X_test)
                 pred_proba = clf.predict_proba(X_test)
-                #pred_proba = pd.DataFrame({key: pred_proba[:, i] for i, key in enumerate(clf.classes_)})
                 actuals = y_test
                 objs = np.array(self.obj_func(predictions, actuals, pred_proba))
                 if type(objs_crossval) == type(None):
@@ -144,8 +143,14 @@ class my_GA:
 
         for x in pf_new:
 
-            if x in pf_best:
+            dup = False
+            for y1 in pf_best:
+                if self.is_better(y1,x) == 0:
+                    dup = True
+                    break
+            if dup:
                 continue
+
 
             if len(pf_best) > 0 :
                 for y in pf_best:
