@@ -87,17 +87,15 @@ class my_GA:
                 clf.fit(X_train, y_train)
                 predictions = clf.predict(X_test)
                 pred_proba = clf.predict_proba(X_test)
+                #pred_proba = pd.DataFrame({key: pred_proba[:, i] for i, key in enumerate(clf.classes_)})
                 actuals = y_test
                 objs = np.array(self.obj_func(predictions, actuals, pred_proba))
-                #prec = objs[0]
-                #rec = objs[0]
                 if type(objs_crossval) == type(None):
                     objs_crossval = objs
                 else:
                     objs_crossval += objs
-               # objs_crossval.append(objs[0])
 
-            objs_crossval = objs_crossval / float(len(self.data_y))
+            objs_crossval = objs_crossval / float(self.crossval_fold)
             self.evaluated[decision] = objs_crossval
         return self.evaluated[decision]
 
@@ -143,18 +141,23 @@ class my_GA:
                     pf_new.pop(j)
                     modified = True
                     break
-        to_add = []
-        for j in range(len(pf_new)):
-            not_dominated = True
-            for i in range(len(pf_best)):
-                if self.is_better( pf_best[i],pf_new[j]) == -1:
-                    not_dominated = False
-                    break
-            if not_dominated:
-                to_add.append(j)
+
+        for x in pf_new:
+
+            if x in pf_best:
+                continue
+
+            if len(pf_best) > 0 :
+                for y in pf_best:
+                    if self.is_better(y,x) == -1:
+                        pf_best.append(x)
+                        modified = True
+                        break
+            else:
+                pf_best.append(x)
                 modified = True
-        for j in to_add:
-            pf_best.append(pf_new[j])
+
+
         return modified
 
     def select(self):
