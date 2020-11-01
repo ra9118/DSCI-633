@@ -39,28 +39,28 @@ if __name__ == "__main__":
     #     if count > 10:
     #         break
 
-    print("Building Bag of Words dataset ....")
+    print("Building Bag of Words and TF-IDF dataset ....")
     dictionary.filter_extremes(no_below=15, no_above=0.5, keep_n=100000)
     bow_corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
 
     #TF-IDF
     # print("Apply TF-IDF")
-    # tfidf = models.TfidfModel(bow_corpus)
-    # corpus_tfidf = tfidf[bow_corpus]
+    tfidf = models.TfidfModel(bow_corpus)
+    corpus_tfidf = tfidf[bow_corpus]
 
 
     numberOfTopics = 10
     print("Starte generate {} LDA Topics ....".format(numberOfTopics))
-    lda_model = gensim.models.LdaMulticore(bow_corpus, num_topics=numberOfTopics, id2word=dictionary, passes=2, workers=2)
+    lda_model = gensim.models.LdaMulticore(corpus_tfidf, num_topics=numberOfTopics, id2word=dictionary, passes=2, workers=2)
     for idx, topic in lda_model.print_topics():
-        print('Topic: {} \nWords: {}'.format(idx, [float(w.split("*")[0]) for w in topic.split("+")]))
+        print('Topic: {} \nWords: {}'.format(idx, topic))
         X["Topic {}".format(idx)] = np.nan
     #     print("=====")
 
     # Find LDA for every document
     print("\nFind LDA topic for every document ....")
-    for row_index in range(len(bow_corpus)):
-        for index, score in sorted(lda_model[bow_corpus[row_index]], key=lambda tup: -1 * tup[1]):
+    for row_index in range(len(corpus_tfidf)):
+        for index, score in sorted(lda_model[corpus_tfidf[row_index]], key=lambda tup: -1 * tup[1]):
             #print("\nScore: {}\t \nTopic: {}".format(score, lda_model.print_topic(index, 10)))
             idx = 0
             for w in lda_model.print_topic(index, 10).split("+"):
