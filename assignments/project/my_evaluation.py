@@ -125,7 +125,10 @@ class my_evaluation:
 
         prec = self.precision(target = target, average=average)
         rec = self.recall(target = target, average=average)
-        f1_score = 2.0 * prec * rec / (prec + rec)
+        if(prec + rec) >0:
+            f1_score = 2.0 * prec * rec / (prec + rec)
+        else:
+            f1_score = 0
         return f1_score
 
     def auc(self, target):
