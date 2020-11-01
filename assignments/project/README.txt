@@ -10,10 +10,11 @@ Prerequest
 
 Before run the project run, open python in terminal and run these lines to load the text processing dataset
 -> python
+-> import nltk
 -> nltk.download('punkt')
 -> nltk.download('stopwords')
 -> nltk.download('wordnet')
-
+ or enable same ablove code in  TextNLP.py lines 4-6  before run the  project and should do above steps for  download  processing dataset for o you when first project run.
 
 To run the project open terminal and run
 python project.py
