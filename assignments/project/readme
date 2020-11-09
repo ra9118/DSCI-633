@@ -1,0 +1,41 @@
+
+Pre-request
+Python 3.5.6
+
+Prerequest
+1- sklearn
+2- pd
+3- np
+4- gensim
+
+
+To run the project open terminal and run
+python3 project.py
+
+
+To run testClient to evaluate results run
+python3 TestClient.py
+
+Results
+expected run time for training 4 - 5 minutes
+correct ration 0.950
+
+Measurement  matrix
+{
+Class 0:
+            {
+                'prec': 0.9567307692307693,
+                'recall': 0.992872416250891,
+                'f1': 0.9744665967121371,
+                'auc': 0.7256838793717896
+            },
+Class 1:
+            {
+                'prec': 0.48717948717948717,
+                'recall': 0.1310344827586207,
+                'f1': 0.2065217391304348,
+                'auc': 0.7267653058716511
+            }
+}
+Average F1 scores:
+{'macro': 0.6319845224590351, 'micro': 0.9505252456794308, 'weighted': 0.9420166088810177}
