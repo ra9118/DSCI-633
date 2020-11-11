@@ -18,10 +18,11 @@ class my_model():
         [dictionary, corpus_tfidf, bow_corpus] = textNLP.tf_idf(processed_docs)
         self._lda_model = textNLP.lda(corpus_tfidf, dictionary)
         X_train = textNLP.apply_lda(self._lda_model, bow_corpus, X_clean)
+        [X_train_balance, y_balance] = textNLP.balanceData(X_train,y)
         # Create Decision Tree classifer object
         self.clf = DecisionTreeClassifier()
         print("(Step 6 of 6)  Train Decision Tree Classifer")
-        self.clf.fit(X_train, y)
+        self.clf.fit(X_train_balance, y_balance)
 
 
     def predict(self, X):
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/job_train.csv")
     # Replace missing values with empty strings
     data = data.fillna("")
+
     y = data["fraudulent"]
     X = data.drop(['fraudulent'], axis=1)
 
