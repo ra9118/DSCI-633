@@ -6,6 +6,7 @@ import string
 from gensim.utils import lemmatize
 from gensim.parsing.preprocessing import remove_stopwords
 from gensim import corpora, models
+from sklearn.utils import resample
 
 # remove  non alphabetic characters.
 remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
@@ -17,6 +18,32 @@ class TextNLP:
         self._pp_colums = pp_colums
         self._numberOfTopics = numberOfTopics
         self._outputCol = outputCol
+
+
+     # Up-sampling is the process of randomly duplicating observations from the minority class in order to reinforce its signal.
+     # There are several heuristics for doing so, but the most common way is to simply resample with replacement.
+     #https://elitedatascience.com/imbalanced-classes
+     def balanceData(self,X,Y):
+        print("(Step 5(B) of 6) balancing the data")
+        data = X
+        data["fraudulent"] = Y
+
+        print(data.fraudulent.value_counts())
+        df_majority = data[data.fraudulent == 0]
+        df_minority = data[data.fraudulent == 1]
+        # Upsample minority class
+        df_minority_upsampled = resample(df_minority,
+                                         replace=True,  # sample with replacement
+                                         n_samples=df_majority.shape[0],  # to match majority class
+                                         random_state=123)  # reproducible results
+
+        # Combine majority class with upsampled minority class
+        df_upsampled = pd.concat([df_majority, df_minority_upsampled])
+
+        # Display new class counts
+        print(df_upsampled.fraudulent.value_counts())
+
+        return [df_upsampled.drop(['fraudulent'], axis=1), df_upsampled["fraudulent"]]
 
 
      # apply pre-processing on cloums that need pre-processing and return rest that dosenot need
