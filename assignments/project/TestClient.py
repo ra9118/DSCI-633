@@ -1,9 +1,6 @@
 import pandas as pd
 import time
-import numpy as np
-
 from sklearn.model_selection import train_test_split
-#from  my_evaluation import my_evaluation
 from  project import  my_model
 from sklearn import metrics
 
@@ -20,7 +17,7 @@ if __name__ == "__main__":
     X = data.drop(['fraudulent'], axis=1)
 
     print("split dataset to training and testing")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33,stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,stratify=y)
 
     clf = my_model()
     clf.fit(X_train, y_train)
