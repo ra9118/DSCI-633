@@ -6,7 +6,6 @@
 import pandas as pd
 import time
 from TextNLP import  TextNLP
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn import preprocessing
 
@@ -18,11 +17,10 @@ class my_model():
 
     def fit(self, X, y):
         print( "=============== Training the model ( takes up to 5 minutes )====================")
-        X_train = textNLP.pre_pro_Cols(X)
-        [X_train_balance, y_balance] = textNLP.balanceData(X_train,y)
-        X_norm = min_max_scaler.fit_transform(X_train_balance)
-
-        # Create Decision Tree classifer object
+        [X_train_balance, y_balance] = textNLP.balanceData(X,y)
+        X_train = textNLP.pre_pro_Cols(X_train_balance)
+        X_norm = min_max_scaler.fit_transform(X_train)
+        # Create stochastic gradient descent
         self.clf = SGDClassifier()
         self.clf.fit(X_norm, y_balance)
 
